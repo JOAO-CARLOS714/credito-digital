@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getStyles } from './estilos/tema';
-import { fetchSolicitacoesSupabase, supabase } from './serviços/supabaseService';
-import Header from './componentes/comuns/Header';
+import { getStyles } from './styles/theme';
+import { fetchSolicitacoesSupabase, supabase } from './services/supabaseService';
+import Header from './components/common/Header';
 import Footer from './components/common/Footer';
+
 
 export default function App() {
   const [screen, setScreen] = useState('home');
