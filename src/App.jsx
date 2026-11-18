@@ -29,10 +29,9 @@ export default function App() {
     carregarDados();
   }, []);
 
-    const handleAdminLogin = async (e) => {
+      const handleAdminLogin = async (e) => {
     e.preventDefault();
     try {
-      // Faz o login ativo no Supabase gerando a sessão 'authenticated'
       const { data, error } = await supabase.auth.signInWithPassword({
         email: adminEmail,
         password: adminPassword,
@@ -42,17 +41,22 @@ export default function App() {
         throw new Error('E-mail ou senha inválidos.');
       }
 
-      setScreen('admin');
       setMessage('');
       
-      // Carrega os dados agora com a sessão autenticada ativa
+      // Busca os dados IMEDIATAMENTE após gerar a sessão autenticada
       const dadosAtualizados = await fetchSolicitacoesSupabase();
-      setSolicitacoes(dadosAtualizados);
+      if (Array.isArray(dadosAtualizados)) {
+        setSolicitacoes(dadosAtualizados);
+      }
+
+      // Muda para a tela de admin por último
+      setScreen('admin');
       
     } catch (error) {
       setMessage(error.message || 'Credenciais administrativas inválidas.');
     }
   };
+
 
 
   if (screen === 'home') {
