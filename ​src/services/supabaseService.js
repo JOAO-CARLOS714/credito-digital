@@ -1,24 +1,42 @@
+import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '../config/supabase';
 
+// Inicializa o client oficial do Supabase para gerenciar sessões e banco
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 export async function fetchSolicitacoesSupabase() {
-  const resposta = await fetch(`${SUPABASE_URL}/rest/v1/solicitacoes?select=*`, {
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+  try {
+    // Utiliza o client oficial que respeita a sessão ativa e as políticas RLS
+    const { data, error } = await supabase
+      .from('solicitacoes')
+      .select('*');
+
+    if (error) {
+      console.error('Erro do Supabase ao buscar solicitações:', error.message);
+      return [];
     }
-  });
-  return await resposta.json();
+
+    return data || [];
+  } catch (erro) {
+    console.error('Erro de conexão ao buscar dados:', erro);
+    return [];
+  }
 }
 
 export async function createSolicitacaoSupabase(dadosSupabase) {
-  return await fetch(`${SUPABASE_URL}/rest/v1/solicitacoes`, {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify(dadosSupabase)
-  });
+  try {
+    const { data, error } = await supabase
+      .from('solicitacoes')
+      .insert([dadosSupabase]);
+
+    if (error) {
+      console.error('Erro ao inserir no Supabase:', error.message);
+      return { ok: false, error: error.message };
+    }
+
+    return { ok: true, data };
+  } catch (erro) {
+    console.error('Erro de conexão ao criar solicitação:', erro);
+    return { ok: false, error: erro.message };
+  }
 }
