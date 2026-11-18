@@ -28,15 +28,31 @@ export default function App() {
     carregarDados();
   }, []);
 
-  const handleAdminLogin = (e) => {
+    const handleAdminLogin = async (e) => {
     e.preventDefault();
-    if (adminEmail === 'admin@creddigital.com' && adminPassword === '123456') {
+    try {
+      // Faz o login ativo no Supabase gerando a sessão 'authenticated'
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: adminEmail,
+        password: adminPassword,
+      });
+
+      if (error) {
+        throw new Error('E-mail ou senha inválidos.');
+      }
+
       setScreen('admin');
       setMessage('');
-    } else {
-      setMessage('Credenciais administrativas inválidas.');
+      
+      // Carrega os dados agora com a sessão autenticada ativa
+      const dadosAtualizados = await fetchSolicitacoesSupabase();
+      setSolicitacoes(dadosAtualizados);
+      
+    } catch (error) {
+      setMessage(error.message || 'Credenciais administrativas inválidas.');
     }
   };
+
 
   if (screen === 'home') {
     return (
