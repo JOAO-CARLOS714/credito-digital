@@ -6,7 +6,15 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export async function fetchSolicitacoesSupabase() {
   try {
-    // Utiliza o client oficial que respeita a sessão ativa e as políticas RLS
+    // 1. Garante que a sessão atual foi carregada/verificada antes de buscar
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      console.warn('Nenhum usuário logado detectado no momento da busca.');
+      return [];
+    }
+
+    // 2. Com a sessão ativa, executa a busca respeitando o RLS
     const { data, error } = await supabase
       .from('solicitacoes')
       .select('*');
@@ -22,6 +30,7 @@ export async function fetchSolicitacoesSupabase() {
     return [];
   }
 }
+
 
 export async function createSolicitacaoSupabase(dadosSupabase) {
   try {
