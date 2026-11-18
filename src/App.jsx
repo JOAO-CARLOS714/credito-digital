@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { getStyles } from './styles/theme';
 import { fetchSolicitacoesSupabase, supabase } from './services/supabaseService';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
-
 
 export default function App() {
   const [screen, setScreen] = useState('home');
@@ -15,23 +14,10 @@ export default function App() {
   const [solicitacoes, setSolicitacoes] = useState([]);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    async function carregarDados() {
-      try {
-        const data = await fetchSolicitacoesSupabase();
-        if (Array.isArray(data)) {
-          setSolicitacoes(data);
-        }
-      } catch (erro) {
-        console.error('Erro ao buscar dados:', erro);
-      }
-    }
-    carregarDados();
-  }, []);
-
   const handleAdminLogin = async (e) => {
     e.preventDefault();
     try {
+      setMessage('');
       const { data, error } = await supabase.auth.signInWithPassword({
         email: adminEmail,
         password: adminPassword,
@@ -40,9 +26,8 @@ export default function App() {
       if (error) {
         throw new Error('E-mail ou senha inválidos.');
       }
-
-      setMessage('');
       
+      // Busca os dados APENAS APÓS o login bem-sucedido com a sessão autenticada
       const dadosAtualizados = await fetchSolicitacoesSupabase();
       if (Array.isArray(dadosAtualizados)) {
         setSolicitacoes(dadosAtualizados);
@@ -53,6 +38,14 @@ export default function App() {
     } catch (error) {
       setMessage(error.message || 'Credenciais administrativas inválidas.');
     }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setSolicitacoes([]);
+    setAdminEmail('');
+    setAdminPassword('');
+    setScreen('home');
   };
 
   if (screen === 'home') {
@@ -126,14 +119,14 @@ export default function App() {
   if (screen === 'admin') {
     return (
       <div style={styles.container}>
-        <Header onHome={() => setScreen('home')} right={<button style={styles.btnOutline} onClick={() => setScreen('home')}>Sair</button>} isLightMode={isLightMode} setIsLightMode={setIsLightMode} styles={styles} />
+        <Header onHome={() => setScreen('home')} right={<button style={styles.btnOutline} onClick={handleLogout}>Sair</button>} isLightMode={isLightMode} setIsLightMode={setIsLightMode} styles={styles} />
         <main style={styles.main}>
           <div style={styles.card}>
             <h2>Gerenciamento de Solicitações</h2>
             <p style={{ fontSize: '13px', opacity: 0.8 }}>Total de registros encontrados: {solicitacoes.length}</p>
             
             {solicitacoes.length === 0 ? (
-              <p style={{ textAlign: 'center', padding: '20px' }}>Nenhuma solicitação encontrada ou aguardando autenticação da sessão.</p>
+              <p style={{ textAlign: 'center', padding: '20px' }}>Nenhuma solicitação encontrada.</p>
             ) : (
               <div style={{ overflowX: 'auto', marginTop: '15px' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
