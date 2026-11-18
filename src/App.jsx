@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { getStyles } from './estilos/tema'; // Apontando para estilos/tema.js
-import { fetchSolicitacoesSupabase, supabase } from './serviços/supabaseService'; // Apontando para serviços
-import Header from './componentes/ comuns/Header'; // Apontando para componentes/ comuns
+import { getStyles } from './estilos/tema';
+import { fetchSolicitacoesSupabase, supabase } from './serviços/supabaseService';
+import Header from './componentes/comuns/Header';
 import Footer from './components/common/Footer';
-
-
 
 export default function App() {
   const [screen, setScreen] = useState('home');
@@ -30,7 +28,7 @@ export default function App() {
     carregarDados();
   }, []);
 
-      const handleAdminLogin = async (e) => {
+  const handleAdminLogin = async (e) => {
     e.preventDefault();
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -44,21 +42,17 @@ export default function App() {
 
       setMessage('');
       
-      // Busca os dados IMEDIATAMENTE após gerar a sessão autenticada
       const dadosAtualizados = await fetchSolicitacoesSupabase();
       if (Array.isArray(dadosAtualizados)) {
         setSolicitacoes(dadosAtualizados);
       }
 
-      // Muda para a tela de admin por último
       setScreen('admin');
       
     } catch (error) {
       setMessage(error.message || 'Credenciais administrativas inválidas.');
     }
   };
-
-
 
   if (screen === 'home') {
     return (
