@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getStyles } from './styles/theme';
-import { fetchSolicitacoesSupabase, supabase } from './services/supabaseService';
-import Header from './components/common/Header';
+import { getStyles } from './estilos/tema'; // Apontando para estilos/tema.js
+import { fetchSolicitacoesSupabase, supabase } from './serviços/supabaseService'; // Apontando para serviços
+import Header from './componentes/ comuns/Header'; // Apontando para componentes/ comuns
 import Footer from './components/common/Footer';
+
 
 
 export default function App() {
