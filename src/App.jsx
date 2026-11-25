@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getStyles } from './styles/theme';
+import { getStyles } from './src/styles/theme';
 import { fetchSolicitacoesSupabase, supabase } from './services/supabaseService';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
